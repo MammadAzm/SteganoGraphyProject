@@ -45,11 +45,28 @@ features:
     epsilon: 0.00000001
 
   score_fusion:
-    method: "weighted_mean"
+    method: "grouped_weighted_mean"
     clip_min: 0.0
     clip_max: 1.0
 
-  # These definitions are provisional until Stage 2 is completed.
+    groups:
+      intensity_complexity:
+        weight: 1.0
+        members:
+          entropy: 0.5
+          variance: 0.5
+
+      spatial_complexity:
+        weight: 1.0
+        members:
+          edge_density: 0.5
+          laplacian_variance: 0.5
+
+      pattern_complexity:
+        weight: 1.0
+        members:
+          lbp_non_uniform_ratio: 1.0
+
   items:
     entropy:
       enabled: true
@@ -66,8 +83,13 @@ features:
       weight: 1.0
       direction: "higher"
 
-    lbp_entropy:
+    lbp_non_uniform_ratio:
       enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    lbp_entropy:
+      enabled: false
       weight: 1.0
       direction: "higher"
 
@@ -76,8 +98,6 @@ features:
       weight: 1.0
       direction: "higher"
 
-    # MSE and PSNR carry closely related information.
-    # They remain disabled until their exact role is finalized.
     mse:
       enabled: false
       weight: 1.0
@@ -98,6 +118,53 @@ features:
       weight: 1.0
       direction: "higher"
 
+
+feature_extraction:
+  grayscale:
+    method: "bt601"
+
+  canny:
+    low_threshold: 100
+    high_threshold: 200
+    aperture_size: 3
+    l2_gradient: true
+
+  lbp:
+    points: 8
+    radius: 1
+    method: "uniform"
+    normalize_entropy: true
+    exclude_border: true
+
+  laplacian:
+    kernel_size: 3
+
+  stego_simulation:
+    method: "lsb_replacement"
+    payload_rate: 0.40
+    max_psnr: 100.0
+
+  ms_ssim:
+    scales: 3
+    weights:
+      - 0.10
+      - 0.30
+      - 0.60
+    gaussian_window_size: 11
+    gaussian_sigma: 1.5
+
+
+feature_review:
+  split: "train"
+  sample_images: 100
+  patches_per_image: 10
+
+  # Review all features, including disabled diagnostic features.
+  include_disabled_features: true
+
+  high_correlation_threshold: 0.85
+  overwrite: true
+  
 labels:
   root_dir: "data/labels"
   file_format: "npz"
