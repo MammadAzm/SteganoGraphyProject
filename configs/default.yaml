@@ -164,7 +164,7 @@ feature_review:
 
   high_correlation_threshold: 0.85
   overwrite: true
-  
+
 labels:
   root_dir: "data/labels"
   file_format: "npz"
@@ -272,3 +272,47 @@ dataset_validation:
     progress_interval: 500
 
   fail_on_error: true
+
+
+
+label_generation:
+  output_root: "data/labels"
+
+  normalization:
+    fit_split: "train"
+    fit_mode: "exact"
+
+    artifact_path: "outputs/label_generation/feature_normalization.json"
+    feature_matrix_path: "outputs/label_generation/train_feature_matrix.float32.dat"
+    raw_cache_dir: "outputs/label_generation/raw_train_features"
+
+    cache_training_features: true
+    reuse_existing_artifact: true
+    delete_feature_matrix_after_fit: true
+    delete_raw_cache_after_success: false
+
+  storage:
+    compressed: true
+
+    save_raw_feature_maps: true
+    save_normalized_feature_maps: true
+    save_group_score_maps: true
+    save_window_coordinates: true
+    save_metadata: true
+
+  execution:
+    max_workers: 4
+    progress_interval: 50
+    resume: true
+    overwrite_existing: false
+
+  integrity:
+    verify_after_write: true
+    fail_on_non_finite: true
+    score_tolerance: 0.000001
+
+  reports:
+    manifest_filename: "manifest.csv"
+    summary_filename: "summary.json"
+    global_summary_path: "outputs/label_generation/label_generation_summary.json"
+

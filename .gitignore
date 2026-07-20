@@ -23,6 +23,9 @@ Thumbs.db
 # Dataset files
 data/processed/
 data/raw/
+data/*/*.jpg
+data/*/*.jpeg
+data/*/*.png
 
 # Generated label files
 data/labels/**/*.npz
@@ -50,3 +53,12 @@ checkpoint
 # Logs
 *.log
 logs/
+
+# Stage 3 generated artifacts
+outputs/label_generation/*
+data/labels/**/*.npz
+data/labels/**/manifest.csv
+data/labels/**/summary.json
+
+!outputs/label_generation/.gitkeep
+!data/labels/**/.gitkeep
