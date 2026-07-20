@@ -1,0 +1,207 @@
+project:
+  name: "steganography_patch_scoring"
+  root_dir: ".."
+  random_seed: 42
+
+dataset:
+  # Change this path when running on another machine.
+  root_dir: "data"
+
+  splits:
+    train: "train_resized"
+    validation: "validation_resized"
+    test: "test_resized"
+
+  image_size:
+    width: 256
+    height: 256
+
+  channels: 3
+  color_mode: "rgb"
+  recursive: true
+
+  allowed_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+
+sliding_window:
+  width: 64
+  height: 64
+
+  stride:
+    x: 8
+    y: 8
+
+  expected_grid:
+    width: 25
+    height: 25
+
+features:
+  normalization:
+    method: "robust_minmax"
+    percentile_low: 1.0
+    percentile_high: 99.0
+    epsilon: 0.00000001
+
+  score_fusion:
+    method: "weighted_mean"
+    clip_min: 0.0
+    clip_max: 1.0
+
+  # These definitions are provisional until Stage 2 is completed.
+  items:
+    entropy:
+      enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    variance:
+      enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    edge_density:
+      enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    lbp_entropy:
+      enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    laplacian_variance:
+      enabled: true
+      weight: 1.0
+      direction: "higher"
+
+    # MSE and PSNR carry closely related information.
+    # They remain disabled until their exact role is finalized.
+    mse:
+      enabled: false
+      weight: 1.0
+      direction: "lower"
+
+    psnr:
+      enabled: false
+      weight: 1.0
+      direction: "higher"
+
+    ssim:
+      enabled: false
+      weight: 1.0
+      direction: "higher"
+
+    ms_ssim:
+      enabled: false
+      weight: 1.0
+      direction: "higher"
+
+labels:
+  root_dir: "data/labels"
+  file_format: "npz"
+  dtype: "float32"
+
+  include_feature_maps: true
+  include_window_coordinates: true
+  include_metadata: true
+
+  filename_suffix: "_labels.npz"
+
+model:
+  architecture: "full_image_cnn_v1"
+  input_channels: 3
+  output_activation: "sigmoid"
+  output_layout: "channels_last"
+
+training:
+  batch_size: 16
+  epochs: 50
+  learning_rate: 0.001
+  loss: "huber"
+
+  early_stopping:
+    enabled: true
+    monitor: "val_loss"
+    patience: 8
+    restore_best_weights: true
+
+  checkpoint:
+    enabled: true
+    monitor: "val_loss"
+    save_best_only: true
+
+threshold_selection:
+  start: 0.50
+  end: 0.66
+  step: 0.01
+
+  reference_threshold: 0.50
+  selection_metric: "f1"
+
+  constraints:
+    minimum_secure_precision: 0.0
+    minimum_secure_recall: 0.0
+
+outputs:
+  root_dir: "outputs"
+
+  directories:
+    feature_statistics: "feature_statistics"
+    models: "models"
+    training_reports: "training_reports"
+    validation_reports: "validation_reports"
+    test_reports: "test_reports"
+    heatmaps: "heatmaps"
+
+runtime:
+  num_workers: 4
+  overwrite_existing: false
+  fail_fast: true
+  deterministic: true
+
+
+dataset_validation:
+  report_dir: "outputs/dataset_reports"
+
+  expected_counts:
+    train: 250
+    validation: 75
+    test: 50
+
+  checks:
+    dimensions: true
+    color_mode: true
+    channels: true
+    full_decode: true
+
+  duplicates:
+    check_filenames: true
+    check_image_ids: true
+    check_content: true
+
+    # Available values:
+    # file   -> hash encoded file bytes
+    # pixels -> hash decoded canonical image pixels
+    content_hash: "pixels"
+
+    within_split_severity: "warning"
+    cross_split_severity: "error"
+
+  unsupported_files:
+    # Available values: ignore, warning, error
+    severity: "ignore"
+
+  reports:
+    save_manifest: true
+    save_issues: true
+    save_summary: true
+    overwrite: true
+
+  execution:
+    # null uses runtime.num_workers from the main configuration.
+    max_workers: null
+    progress_interval: 500
+
+  fail_on_error: true

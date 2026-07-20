@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Dataset files
+data/processed/
+data/raw/
+
+# Generated label files
+data/labels/**/*.npz
+data/labels/**/*.h5
+data/labels/**/*.hdf5
+data/labels/**/*.zarr/
+
+# Generated outputs
+outputs/feature_statistics/*
+outputs/heatmaps/*
+outputs/models/*
+outputs/test_reports/*
+outputs/training_reports/*
+outputs/validation_reports/*
+
+# Preserve empty directories
+!**/.gitkeep
+
+# TensorFlow and model files
+*.keras
+*.h5
+*.ckpt
+checkpoint
+
+# Logs
+*.log
+logs/
