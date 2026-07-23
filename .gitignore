@@ -62,3 +62,13 @@ data/labels/**/summary.json
 
 !outputs/label_generation/.gitkeep
 !data/labels/**/.gitkeep
+
+# Stage 4 label inspection outputs
+outputs/label_inspection/*
+
+!outputs/label_inspection/.gitkeep
+
+# Stage 5 dataset-loader reports
+outputs/dataset_loader/*
+
+!outputs/dataset_loader/.gitkeep

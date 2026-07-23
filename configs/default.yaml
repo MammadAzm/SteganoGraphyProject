@@ -316,3 +316,110 @@ label_generation:
     summary_filename: "summary.json"
     global_summary_path: "outputs/label_generation/label_generation_summary.json"
 
+
+label_inspection:
+  output_root: "outputs/label_inspection"
+
+  expected_counts:
+    train: 10000
+    validation: 3000
+    test: 2000
+
+  required_arrays:
+    - score_map
+    - raw_feature_maps
+    - normalized_feature_maps
+    - group_score_maps
+    - window_coordinates
+    - feature_names
+    - group_names
+    - metadata_json
+
+  preview_thresholds:
+    - 0.50
+    - 0.55
+    - 0.60
+    - 0.65
+
+  numerical_tolerance: 0.000001
+
+  distribution:
+    comparison_sample_limit: 500000
+    histogram_bins: 50
+
+  suspicious:
+    constant_map_std: 0.000001
+    low_map_std: 0.03
+    high_map_std: 0.25
+
+    low_score_threshold: 0.10
+    high_score_threshold: 0.90
+    extreme_fraction: 0.95
+
+    excessive_zero_fraction: 0.20
+    excessive_one_fraction: 0.20
+
+    group_disagreement_threshold: 0.50
+
+    isolated_peak_difference: 0.35
+    isolated_peak_fraction: 0.01
+
+  visualization:
+    enabled: true
+    samples_per_category: 3
+    max_images_per_split: 24
+    top_windows: 5
+    bottom_windows: 5
+    overlay_alpha: 0.45
+    dpi: 160
+    random_seed: 42
+
+  reports:
+    overwrite: true
+
+dataset_loader:
+  approval_path: "outputs/label_inspection/label_approval.json"
+  output_root: "outputs/dataset_loader"
+
+  approval:
+    require_approved: true
+    require_zero_critical_errors: true
+    require_matching_fingerprints: true
+
+  input:
+    color_mode: "rgb"
+    dtype: "float32"
+    scaling: "zero_one"
+
+  target:
+    array_name: "score_map"
+    dtype: "float32"
+    add_channel_dimension: true
+    minimum: 0.0
+    maximum: 1.0
+
+  validation:
+    validate_images_when_indexing: true
+    validate_labels_when_indexing: true
+    verify_sample_when_loading: true
+    numerical_tolerance: 0.000001
+
+  batching:
+    train_batch_size: 16
+    validation_batch_size: 16
+    test_batch_size: 16
+
+    shuffle_train: true
+    shuffle_validation: false
+    shuffle_test: false
+
+    drop_remainder: false
+    random_seed: 42
+
+  tensorflow:
+    num_parallel_calls: "autotune"
+    prefetch: "autotune"
+    deterministic: true
+
+  reports:
+    overwrite: true
